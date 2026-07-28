@@ -1,7 +1,8 @@
 # RESULTS 核心結果與限制導讀
 
-本頁選譯 P1 所需的 headline、on-chip generation 與 limitations；它不是
-`RESULTS.md` 的逐行完整翻譯。所有結果均來自 upstream commit
+本頁是 headline、on-chip generation 與 limitations 的快速導讀；完整
+逐章繁中翻譯見 [`../../RESULTS.zh-TW.md`](../../RESULTS.zh-TW.md)。
+所有結果均來自 upstream commit
 `74744182329f08d7a1badc97e47576ef527532a0`，不是本倉庫實測。
 
 ## 原文翻譯：Headline

@@ -1,6 +1,6 @@
 # Translation contract
 
-本文件定義 `esp32-ai` 非官方繁體中文文件的來源、標籤與同步規則。
+本文件定義 `esp32-ai` 非官方完整繁體中文文件的來源、標籤與同步規則。
 
 ## Source baseline
 
@@ -14,6 +14,18 @@
 此翻譯使用 AI 協助起草，並逐項對照上述 commit 的 `README.md`、
 `RESULTS.md`、`firmware/esp32_llm/README.md`、原始 X 公告與 repository
 內容。它不是 upstream 作者提供或認可的官方翻譯。
+
+## 文件對照
+
+| upstream source | 繁中版本 | 狀態 |
+|---|---|---|
+| `README.md` | [`README.md`](README.md) | 完整翻譯；GitHub 預設入口 |
+| `README.md` | [`README.en.md`](README.en.md) | pinned 英文原文，byte-for-byte 保留 |
+| `RESULTS.md` | [`RESULTS.zh-TW.md`](RESULTS.zh-TW.md) | 完整翻譯 |
+| `firmware/esp32_llm/README.md` | [`docs/zh-TW/firmware-guide.md`](docs/zh-TW/firmware-guide.md) | 完整翻譯；所有 code blocks 原樣保留 |
+
+[`README.zh-TW.md`](README.zh-TW.md) 只作為既有連結的相容入口，完整內容
+以 root [`README.md`](README.md) 為單一中文首頁。
 
 ## Evidence labels
 
@@ -48,9 +60,11 @@ parameters` 一律譯為「儲存參數量」，不得改寫為「模型能力�
 若翻譯與英文來源有歧義，以 pinned upstream source 為準。同步時：
 
 1. fetch upstream，但不要直接覆寫中文文件；
-2. 比較目前基準 commit 與新 commit 的 `README.md`、`RESULTS.md`、
-   `firmware/esp32_llm/README.md` 及 LICENSE；
-3. 逐段更新翻譯、來源連結與 evidence label；
+2. 比較目前基準 commit 與新 commit 的 upstream `README.md`、
+   `RESULTS.md`、`firmware/esp32_llm/README.md` 及 LICENSE；
+3. 先更新 byte-for-byte 英文鏡像 `README.en.md`，再逐段更新
+   `README.md`、`RESULTS.zh-TW.md`、firmware 翻譯、來源連結與
+   evidence label；
 4. 更新本文件的 commit 與 `last source sync`；
 5. 執行 `python3 scripts/check_docs.py` 與 `git diff --check`；
 6. 若效能或能力結論改變，保留舊 receipt，新增有日期的新 receipt。

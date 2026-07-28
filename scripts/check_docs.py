@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Deterministic checks for the zh-TW documentation slice."""
+"""Deterministic checks for the complete zh-TW documentation."""
 
 from __future__ import annotations
 
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -14,7 +15,10 @@ UPSTREAM_COMMIT = "74744182329f08d7a1badc97e47576ef527532a0"
 
 REQUIRED_FILES = (
     "README.md",
+    "README.en.md",
     "README.zh-TW.md",
+    "RESULTS.md",
+    "RESULTS.zh-TW.md",
     "TRANSLATION.md",
     "LICENSE",
     "docs/zh-TW/original-announcement.md",
@@ -28,7 +32,9 @@ REQUIRED_FILES = (
 )
 
 TRANSLATED_PAGES = (
+    "README.md",
     "README.zh-TW.md",
+    "RESULTS.zh-TW.md",
     "docs/zh-TW/original-announcement.md",
     "docs/zh-TW/architecture.md",
     "docs/zh-TW/results-guide.md",
@@ -36,6 +42,24 @@ TRANSLATED_PAGES = (
     "docs/zh-TW/reproduction-status.md",
     "docs/zh-TW/third-party-claims.md",
     "docs/zh-TW/glossary.md",
+)
+
+PINNED_SOURCE_SHA256 = {
+    "README.en.md": "4057bd2b8c3516726098f7ff261d2d047e2309e170be39c3e00e44687bdba02a",
+    "RESULTS.md": "13297394adae8d07551013a3b8152b08cb56e6e10ca0e4e9312a0d5441f556f3",
+    "firmware/esp32_llm/README.md": "4705e719f96f33983f74e0e6a9244717c1fbfc8411d4f8b13bfdc6f26ec32a3f",
+    "LICENSE": "165a5ae4e9fc90ee1087701fccb527c884eb839fde089a18f85965972b3c84e4",
+}
+
+REQUIRED_RESULTS_HEADINGS = (
+    "## Headline：可部署設定",
+    "## Vocab 為何重要",
+    "## Controls 證明了什麼",
+    "## Hardware：N16R8 bandwidth 實測",
+    "## On-chip generation：完整模型運行",
+    "## 4-bit quantization：優勢仍保留",
+    "## 其餘限制",
+    "## 下一步",
 )
 
 DISCLAIMER_LINES = (
@@ -137,13 +161,33 @@ def check_local_links(errors: list[str]) -> None:
                 )
 
 
+def check_pinned_sources(errors: list[str]) -> None:
+    for relative_path, expected_sha256 in PINNED_SOURCE_SHA256.items():
+        path = ROOT / relative_path
+        actual_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual_sha256 != expected_sha256:
+            errors.append(
+                f"{relative_path}: pinned source SHA-256 changed "
+                f"(expected {expected_sha256}, got {actual_sha256})"
+            )
+
+
 def check_disclaimer_and_commit(errors: list[str]) -> None:
-    readme = read_text("README.zh-TW.md")
+    readme = read_text("README.md")
     for line in DISCLAIMER_LINES:
         if line not in readme:
-            errors.append(f"README.zh-TW.md: missing disclaimer line: {line}")
+            errors.append(f"README.md: missing disclaimer line: {line}")
     if UPSTREAM_COMMIT not in readme:
-        errors.append("README.zh-TW.md: missing full upstream commit")
+        errors.append("README.md: missing full upstream commit")
+    if readme.startswith("# Running a"):
+        errors.append("README.md: default GitHub entry is still English")
+
+
+def check_complete_results(errors: list[str]) -> None:
+    results = read_text("RESULTS.zh-TW.md")
+    for heading in REQUIRED_RESULTS_HEADINGS:
+        if heading not in results:
+            errors.append(f"RESULTS.zh-TW.md: missing translated section: {heading}")
 
 
 def check_attribution(errors: list[str]) -> None:
@@ -210,7 +254,9 @@ def main() -> int:
 
     if not errors:
         check_local_links(errors)
+        check_pinned_sources(errors)
         check_disclaimer_and_commit(errors)
+        check_complete_results(errors)
         check_attribution(errors)
         check_performance_evidence(errors)
         check_false_attribution(errors)
@@ -222,8 +268,8 @@ def main() -> int:
         return 1
 
     print(
-        "docs check passed: required files, links, disclaimer, attribution, "
-        "evidence labels, and source boundaries"
+        "docs check passed: complete zh-TW files, pinned sources, links, "
+        "disclaimer, attribution, evidence labels, and source boundaries"
     )
     return 0
 
